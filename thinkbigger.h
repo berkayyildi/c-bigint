@@ -147,19 +147,24 @@ public:
 	
 	DoublyLinkedList <char> tokens;							//Tokenleri depola char linked list
 	DoublyLinkedList <int> *sayilarim[5];					//Sayıları depolamak icin pointer array yarat
-		
+	DoublyLinkedList <int> *sonuclar[5];					//Sonuclari pointer array yarat
+
     ThinkBigger() {
-        //TODO 
+        createBigInt(tokens, sayilarim);
     }
-	void addBigInt(int num1,int num2, DoublyLinkedList <int> &sonuc);
+	void addBigInt(int num1,int num2, int save_index);
+	void addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, int save_index);	//Overload yapildi
+	
 	void createBigInt(DoublyLinkedList <char> tokens, DoublyLinkedList <int> *sayilarim[5]);
-	void multiplyBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int> &sonuc2);
+	void multiplyBigInt(int num1,int num2, int save_index);
 };
 
-void ThinkBigger::addBigInt(int num1,int num2, DoublyLinkedList <int> &sonuc){
+void ThinkBigger::addBigInt(int num1,int num2, int save_index){
 
 	DoublyLinkedList <int> dll1 = *sayilarim[0];
 	DoublyLinkedList <int> dll2 = *sayilarim[1];
+	sonuclar[save_index] = new DoublyLinkedList<int>();
+	
 	int fark = dll1.size()-dll2.size();
 	int abs_fark = abs(dll1.size()-dll2.size());
 	int elde = 0;
@@ -175,21 +180,48 @@ void ThinkBigger::addBigInt(int num1,int num2, DoublyLinkedList <int> &sonuc){
 		
 		if (toplam > 10){toplam = toplam - 10; elde =1;}else{elde = 0;}
 		
-		sonuc.addToDLLHead(toplam);
-
+		sonuclar[save_index]->addToDLLHead(toplam);
 	}
 
-	if (elde == 1){	sonuc.addToDLLHead(elde);	}	//ELDE Yİ DE EKLE SON OLARAK
+	if (elde == 1){	sonuclar[save_index]->addToDLLHead(elde);	}	//ELDE Yİ DE EKLE SON OLARAK
 	
 	for (int i=0 ; i < abs_fark ; i++){	//EKLENEN 0 LARI KALDIR
 		if (fark > 0){	dll2.deleteFromDLLHead();	}	else {	dll1.deleteFromDLLHead();	}
 	}
 
-
 }
 
 
 
+void ThinkBigger::addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, int save_index){	//OVERLOADED OLAN FONKSIYON
+
+	sonuclar[save_index] = new DoublyLinkedList<int>();
+	
+	int fark = dll1.size()-dll2.size();
+	int abs_fark = abs(dll1.size()-dll2.size());
+	int elde = 0;
+	int toplam;
+	
+	for (int i=0 ; i < abs_fark ; i++){	//KUCUK SAYININ SOL BOSLUGUNU 0 LA DOLDUR
+		if (fark > 0){	dll2.addToDLLHead(0);	}	else {	dll1.addToDLLHead(0);	}
+	}
+
+	for (int i=0 ; i < dll1.size() ; i++){	//SIZE FARKETMEZ ZATEN ESIT
+
+		toplam = dll1.nth_eleman(dll1.size()-1-i) + dll2.nth_eleman(dll2.size()-1-i) + elde;
+		
+		if (toplam > 10){toplam = toplam - 10; elde =1;}else{elde = 0;}
+		
+		sonuclar[save_index]->addToDLLHead(toplam);
+	}
+
+	if (elde == 1){	sonuclar[save_index]->addToDLLHead(elde);	}	//ELDE Yİ DE EKLE SON OLARAK
+	
+	for (int i=0 ; i < abs_fark ; i++){	//EKLENEN 0 LARI KALDIR
+		if (fark > 0){	dll2.deleteFromDLLHead();	}	else {	dll1.deleteFromDLLHead();	}
+	}
+
+}
 
 
 void ThinkBigger::createBigInt(DoublyLinkedList <char> tokens, DoublyLinkedList <int> *sayilarim[5]){
@@ -221,7 +253,7 @@ fin.open("input.txt", ios::in);
 			sayilarim[sayi_index]->addToDLLTail(temp_char-48);			//olusan pointer array adresinden sayiyi bul ve ekle (char to int convert yap ayrica)
 		}
 	}
-	
+
 }
 
 
@@ -231,30 +263,44 @@ fin.open("input.txt", ios::in);
 
 
 
-void ThinkBigger::multiplyBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int> &sonuc2){
+void ThinkBigger::multiplyBigInt(int num1,int num2, int save_index){
 
-	//int fark = dll1.size()-dll2.size();
-	//int abs_fark = abs(dll1.size()-dll2.size());
-	int carpim;
+	DoublyLinkedList <int> dll1 = *sayilarim[0];
+	DoublyLinkedList <int> dll2 = *sayilarim[1];
+	
+	DoublyLinkedList <int> *multiply_sum_cache[50];					//Carpim temp for sum
+	
+	int carpim = 0;
 	int elde = 0;
 	
 	for (int i=0 ; i < dll1.size() ; i++){	
 		
+		multiply_sum_cache[i] = new DoublyLinkedList<int>();
+		for (int k=0 ; k < i ; k++){	multiply_sum_cache[i]->addToDLLHead(0); }	// 0 ekle i sayisi kadar ki toplarken bir sola kaymis gibi olsun
+		
 		for (int j=0 ; j < dll2.size() ; j++){	
 		
-			carpim = dll1.nth_eleman(dll1.size()-1-i) * dll2.nth_eleman(dll2.size()-1-j) + elde;
-			
-			while (carpim < 10){
+			carpim = dll1.nth_eleman(dll1.size()-1-i) * dll2.nth_eleman(dll2.size()-1-j) + elde;	//Elemanlari n2 for loopla carp eldeyi ekle hep
+			elde = 0;					//Elde eklendi - Reset Elde 
+			while (carpim > 10){		//10 dan kücük olana kadar 10 ar azalt eldeyi 1 arttir
 				carpim -= 10; elde++;
 			}
-		
-			sonuc2.addToDLLHead(carpim);
-			cout << carpim <<" eklendi \n";
-			elde = 0;
+			
+			multiply_sum_cache[i]->addToDLLHead(carpim);
+
+			//cout << carpim <<"";
+
 		}
 		
+		multiply_sum_cache[i]->addToDLLHead(elde);				//Carpma toplam satiri bitimine eldeyi ekle
+		//cout << elde <<" \n";
+		elde = 0; carpim = 0; //Reset Elde & Carpim
 	}
-	cout << sonuc2;
+
+sonuclar[save_index] = new DoublyLinkedList<int>();
+cout << *multiply_sum_cache[0] << endl;
+cout << *multiply_sum_cache[1] << endl;
+//cout << multiply_sum_cache[0][2] << endl;
 }
 
 
