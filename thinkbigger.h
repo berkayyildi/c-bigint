@@ -30,7 +30,7 @@ public:
     }
     void clear();
     int size();			//SIZE VEREN FOKNSIYON
-    int nth_eleman(int elem);	//SIRADAN YAZAN FONKSIYON
+    T nth_eleman(int elem);	//SIRADAN YAZAN FONKSIYON
     void setToNull() {
         head = tail = 0;
     }
@@ -56,7 +56,7 @@ int DoublyLinkedList<T>::size() {	//SIZE VEREN FONKSIYONUMUZ
 }
 
 template<class T>
-int DoublyLinkedList<T>::nth_eleman(int elem) {	//n inci elemani veren (iterator gibi yapmak zor :( )
+T DoublyLinkedList<T>::nth_eleman(int elem) {	//n inci elemani veren (iterator gibi yapmak zor :( )
     
     DLLNode<T> *tmp = head;
    
@@ -153,78 +153,75 @@ public:
         createBigInt(tokens, sayilarim);
     }
 	void addBigInt(int num1,int num2, int save_index);
-	void addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, int save_index);	//Overload yapildi
-	
-	void createBigInt(DoublyLinkedList <char> tokens, DoublyLinkedList <int> *sayilarim[5]);
+	void addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int>  &save_dllist);	//Overload yapildi (Çarpma için kullanılan bu)
+	void update(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2);
+	void createBigInt(DoublyLinkedList <char> &tokens, DoublyLinkedList <int> *sayilarim[5]);
 	void multiplyBigInt(int num1,int num2, int save_index);
 };
 
+
+
 void ThinkBigger::addBigInt(int num1,int num2, int save_index){
 
-	DoublyLinkedList <int> dll1 = *sayilarim[0];
-	DoublyLinkedList <int> dll2 = *sayilarim[1];
+	DoublyLinkedList <int> dll1 = *sayilarim[num1];
+	DoublyLinkedList <int> dll2 = *sayilarim[num2];
+	
 	sonuclar[save_index] = new DoublyLinkedList<int>();
+	
+	addBigInt(dll1,dll2,*sonuclar[save_index]);	//Orjinal add i çalıştır
+		
+}
+
+
+void ThinkBigger::addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int>  &save_dllist){	//OVERLOADED OLAN FONKSIYON  (Çarpma için)
+
+
 	
 	int fark = dll1.size()-dll2.size();
 	int abs_fark = abs(dll1.size()-dll2.size());
 	int elde = 0;
 	int toplam;
 	
-	for (int i=0 ; i < abs_fark ; i++){	//KUCUK SAYININ SOL BOSLUGUNU 0 LA DOLDUR
+	for (int i=0 ; i < abs_fark ; i++){					//KUCUK SAYININ SOL BOSLUGUNU 0 LA DOLDUR
 		if (fark > 0){	dll2.addToDLLHead(0);	}	else {	dll1.addToDLLHead(0);	}
 	}
 
-	for (int i=0 ; i < dll1.size() ; i++){	//SIZE FARKETMEZ ZATEN ESIT
+	for (int i=0 ; i < dll1.size() ; i++){				//SIZE FARKETMEZ ZATEN ESIT LOOP ICINDE TOPLA
 
 		toplam = dll1.nth_eleman(dll1.size()-1-i) + dll2.nth_eleman(dll2.size()-1-i) + elde;
 		
-		if (toplam > 10){toplam = toplam - 10; elde =1;}else{elde = 0;}
+		if (toplam >= 10){toplam = toplam - 10; elde =1;}else{elde = 0;}
 		
-		sonuclar[save_index]->addToDLLHead(toplam);
+		save_dllist.addToDLLHead(toplam);
 	}
 
-	if (elde == 1){	sonuclar[save_index]->addToDLLHead(elde);	}	//ELDE Yİ DE EKLE SON OLARAK
+	if (elde == 1){	save_dllist.addToDLLHead(elde);	}	//ELDE VARSA DA EKLE SON OLARAK
 	
-	for (int i=0 ; i < abs_fark ; i++){	//EKLENEN 0 LARI KALDIR
+	for (int i=0 ; i < abs_fark ; i++){					//EKLENEN 0 LARI TEMIZLE
 		if (fark > 0){	dll2.deleteFromDLLHead();	}	else {	dll1.deleteFromDLLHead();	}
 	}
 
 }
 
+void ThinkBigger::update(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2){	// dll 1 = dll2 yapar
 
+	//cout << endl << "Bu Eski 1: " << dll1 << endl;
+	//cout << endl << "Bu Eski 2: " << dll2 << endl;
 
-void ThinkBigger::addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, int save_index){	//OVERLOADED OLAN FONKSIYON
+		dll1.clear();
 
-	sonuclar[save_index] = new DoublyLinkedList<int>();
+	for (int i=0 ; i < dll2.size() ; i++){	//SIZE FARKETMEZ ZATEN ESIT
+
+		dll1.addToDLLHead(dll2.nth_eleman(dll2.size()-1-i));
 	
-	int fark = dll1.size()-dll2.size();
-	int abs_fark = abs(dll1.size()-dll2.size());
-	int elde = 0;
-	int toplam;
+	}
 	
-	for (int i=0 ; i < abs_fark ; i++){	//KUCUK SAYININ SOL BOSLUGUNU 0 LA DOLDUR
-		if (fark > 0){	dll2.addToDLLHead(0);	}	else {	dll1.addToDLLHead(0);	}
-	}
-
-	for (int i=0 ; i < dll1.size() ; i++){	//SIZE FARKETMEZ ZATEN ESIT
-
-		toplam = dll1.nth_eleman(dll1.size()-1-i) + dll2.nth_eleman(dll2.size()-1-i) + elde;
-		
-		if (toplam > 10){toplam = toplam - 10; elde =1;}else{elde = 0;}
-		
-		sonuclar[save_index]->addToDLLHead(toplam);
-	}
-
-	if (elde == 1){	sonuclar[save_index]->addToDLLHead(elde);	}	//ELDE Yİ DE EKLE SON OLARAK
-	
-	for (int i=0 ; i < abs_fark ; i++){	//EKLENEN 0 LARI KALDIR
-		if (fark > 0){	dll2.deleteFromDLLHead();	}	else {	dll1.deleteFromDLLHead();	}
-	}
-
+	//cout << endl << "Bu Yeni 1: " << dll1 << endl;
+	//cout << endl << "Bu Yeni 2: " << dll2 << endl;
 }
 
 
-void ThinkBigger::createBigInt(DoublyLinkedList <char> tokens, DoublyLinkedList <int> *sayilarim[5]){
+void ThinkBigger::createBigInt(DoublyLinkedList <char> &tokens, DoublyLinkedList <int> *sayilarim[5]){
 		
 char temp_char;
 int sayi_index = 0;										//sayi indexlerini saydir
@@ -265,11 +262,13 @@ fin.open("input.txt", ios::in);
 
 void ThinkBigger::multiplyBigInt(int num1,int num2, int save_index){
 
-	DoublyLinkedList <int> dll1 = *sayilarim[0];
-	DoublyLinkedList <int> dll2 = *sayilarim[1];
+	DoublyLinkedList <int> dll1 = *sayilarim[num1];
+	DoublyLinkedList <int> dll2 = *sayilarim[num2];
 	
 	DoublyLinkedList <int> *multiply_sum_cache[50];					//Carpim temp for sum
 	
+	sonuclar[save_index] = new DoublyLinkedList<int>();
+
 	int carpim = 0;
 	int elde = 0;
 	
@@ -297,11 +296,33 @@ void ThinkBigger::multiplyBigInt(int num1,int num2, int save_index){
 		elde = 0; carpim = 0; //Reset Elde & Carpim
 	}
 
-sonuclar[save_index] = new DoublyLinkedList<int>();
-cout << *multiply_sum_cache[0] << endl;
-cout << *multiply_sum_cache[1] << endl;
-//cout << multiply_sum_cache[0][2] << endl;
+
+//----------------------------------------------------------------------
+DoublyLinkedList <int> toplam_temp;
+	
+for (int i=0; i < dll2.size()-1; i++){	//
+	//cout << multiply_sum_cache[i][0] << endl; 								//for debugging
+	
+	addBigInt(multiply_sum_cache[0][0],multiply_sum_cache[i+1][0],toplam_temp);	//ilk 2 elemanı topla temp'e yaz
+	
+	//cout << multiply_sum_cache[0][0] << " + " << multiply_sum_cache[i+1][0] << " = " << toplam_temp << endl;	//for debugging
+	
+	update(multiply_sum_cache[0][0], toplam_temp );								//temp toplamı ilk elemana yaz
+	
+	toplam_temp.clear();														//temp toplami temizle
+	
+	//cout << "Ilk eleman updated to " << multiply_sum_cache[0][0] << endl;		//for debugging
+
 }
 
+cout << "sonucumuz : " << endl << multiply_sum_cache[0][0] << endl;
+
+//addBigInt(toplam_temp,multiply_sum_cache[i+1][0],toplam_temp);	//ilk 2 elemanı topla
+//----------------------------------------------------------------------
+
+//update(multiply_sum_cache[0][0], multiply_sum_cache[1][0] );
+
+
+}
 
 #endif
