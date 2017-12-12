@@ -264,7 +264,7 @@ void ThinkBigger::multiplyBigInt(int num1,int num2, int save_index){
 
 	DoublyLinkedList <int> dll1 = *sayilarim[num1];
 	DoublyLinkedList <int> dll2 = *sayilarim[num2];
-	
+
 	DoublyLinkedList <int> *multiply_sum_cache[50];					//Carpim temp for sum
 	
 	sonuclar[save_index] = new DoublyLinkedList<int>();
@@ -300,9 +300,9 @@ void ThinkBigger::multiplyBigInt(int num1,int num2, int save_index){
 //----------------------------------------------------------------------
 DoublyLinkedList <int> toplam_temp;
 	
-for (int i=0; i < dll2.size()-1; i++){	//
+for (int i=0; i < dll1.size()-1; i++){											// dll1 kadar yani alttaki sayinin basamak sayisi kadar toplama yapilacak
 	//cout << multiply_sum_cache[i][0] << endl; 								//for debugging
-	
+	//cout << "loopcount : " << dll1.size() << endl;
 	addBigInt(multiply_sum_cache[0][0],multiply_sum_cache[i+1][0],toplam_temp);	//ilk 2 elemanı topla temp'e yaz
 	
 	//cout << multiply_sum_cache[0][0] << " + " << multiply_sum_cache[i+1][0] << " = " << toplam_temp << endl;	//for debugging
@@ -315,7 +315,9 @@ for (int i=0; i < dll2.size()-1; i++){	//
 
 }
 
-cout << "sonucumuz : " << endl << multiply_sum_cache[0][0] << endl;
+update(*sonuclar[save_index], multiply_sum_cache[0][0] );									//Son olarak istenilen indexe cachedeki sayıyı geçir
+
+//cout << "Carpma Sonucumuz : " << multiply_sum_cache[0][0] << endl;
 
 //addBigInt(toplam_temp,multiply_sum_cache[i+1][0],toplam_temp);	//ilk 2 elemanı topla
 //----------------------------------------------------------------------
