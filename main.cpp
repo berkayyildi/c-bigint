@@ -12,7 +12,7 @@ int main()
 	
 	islemler.createBigInt("input.txt");		//Metin Belgesinden okur
 	
-	islemler.update(0, "2");				//Okunan sayiyi update eder update(update edilecek sayi index, yeni sayi)
+	//islemler.update(0, "2");				//Okunan sayiyi update eder update(update edilecek sayi index, yeni sayi)
 	
 	//islemler.update(1, "7");				//Okunan sayiyi update eder update(update edilecek sayi index, yeni sayi)
 	
