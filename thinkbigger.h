@@ -31,11 +31,14 @@ public:
     bool isEmpty() const {
         return head == 0;
     }
-    DLLNode<T>* gettail()  {		//TAIL DONDUREN FUNC
+    DLLNode<T>* gettail()  {//TAIL DONDUREN FUNC
         return tail;
     }
+    DLLNode<T>* gethead()  {//TAIL DONDUREN FUNC
+        return head;
+    }
     void clear();
-    int size();			//SIZE VEREN FOKNSIYON
+    int size();				//SIZE VEREN FOKNSIYON
     T nth_eleman(int elem);	//SIRADAN YAZAN FONKSIYON
     void setToNull() {
         head = tail = 0;
@@ -151,35 +154,35 @@ void DoublyLinkedList<T>::clear() {
 
 class ThinkBigger {
 public:
-	
-	DoublyLinkedList <char> tokens;							//Tokenleri depola char linked list
-	DoublyLinkedList <int> *sayilarim[MAX_NUM];					//Sayıları depolamak icin pointer array yarat
 
-    ThinkBigger() {
-        createBigInt(tokens, sayilarim);	//oku
-        run();								//calistir
-        save();								//kaydet
-    }
-    void run();
-    void save();
+    //ThinkBigger() {	}	//Otomatik Çalıştırır
+    void createBigInt(string s);
+    void run();			
+    void save(string s);
+    void update(int sayino, string s);	//OVERLOADED KULLANICININ KULLANACAGI NORMALI PRIVATE DLL,DLL
+    
+private:
+	DoublyLinkedList <char> tokens;							//Tokenleri depola char linked list (Once tokens yaratilmali)
+	DoublyLinkedList <int> *sayilarim[MAX_NUM];				//Sayıları depolamak icin pointer array yarat
     DLLNode<int>* gettail(DoublyLinkedList <int> &dll)  {
         return dll.gettail();
     }
-
+    DLLNode<int>* gethead(DoublyLinkedList <int> &dll)  {
+        return dll.gethead();
+    }
+	void update(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2);
 	void addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int>  &save_dllist);
 	void subBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2, DoublyLinkedList <int>  &save_dllist);
-	void update(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2);
-	void createBigInt(DoublyLinkedList <char> &tokens, DoublyLinkedList <int> *sayilarim[MAX_NUM]);
 	void multiplyBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &dll2);
 };
 
-void ThinkBigger::run(){		//Çarpma işlemlerini yap sonuclari soldaki sayiya kaydet, Carpmada kullanilan 2. sayiyi 0 yap
+void ThinkBigger::run(){		//Bitisik çarpma işlemlerini yap sonuclari bitisiklerin solundaki sayiya kaydet, Carpmada kullanilan diger sayilari 0 yap
 	int now_multp_index = -1;
 	for (int i=0 ; i < tokens.size() ; i++){
 		if (tokens.nth_eleman(i) == '*'){
 				if (now_multp_index == -1 ) {now_multp_index = i;}
-				multiplyBigInt(*sayilarim[now_multp_index],*sayilarim[i+1]);				//(Sayı , Sayı, Sonuclar Arrayi Save Index)
-				sayilarim[i+1]->clear();									//Carpimda kullanilan sayilari sifirla
+				multiplyBigInt(*sayilarim[now_multp_index],*sayilarim[i+1]);	//(Sayı , Sayı, Sonuclar Arrayi Save Index)
+				sayilarim[i+1]->clear();										//Carpimda kullanilan sayilari sifirla
 				sayilarim[i+1]->addToDLLHead(0);
 		}else{
 			now_multp_index = -1;
@@ -199,13 +202,20 @@ DoublyLinkedList <int> toplam_sayilar_temp;
 	
 }
 
-void ThinkBigger::save(){
+void ThinkBigger::save(string s){
+	
 
-	cout << "FINAL RESULT :" << *sayilarim[0] << endl; 
+	if (gethead(*sayilarim[0])->info == 0){	//Ilk eleman sifirsa ilk elemani sil
+		sayilarim[0]->deleteFromDLLHead();
+	}
+
+	cout << "FINAL RESULT :" << *sayilarim[0] << endl; 	//Sonucu terminale yazs
 	
-	freopen("outout.txt","w",stdout);
+	const char *cstr = s.c_str();	//freopen fonksiyonu parametre olarak char istiyor
 	
-    cout << *sayilarim[0];
+	freopen(cstr,"w",stdout);		//istenen dosya isminde kayit yap
+	
+    cout << *sayilarim[0];			//Sonucu dosyaya yazdır
 	
 }
 
@@ -222,10 +232,10 @@ void ThinkBigger::addBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int>
 	}
 	
 	
-		DLLNode<int> *tmp_tail_1 = gettail(dll1);
-		DLLNode<int> *tmp_tail_2 = gettail(dll2);
+	DLLNode<int> *tmp_tail_1 = gettail(dll1);
+	DLLNode<int> *tmp_tail_2 = gettail(dll2);
 
-	
+
 	for (int i=0 ; i < dll1.size() ; i++){				//SIZE FARKETMEZ ZATEN ESIT LOOP ICINDE TOPLA
 
 		toplam = tmp_tail_1->info + tmp_tail_2->info + elde;
@@ -260,10 +270,10 @@ void ThinkBigger::subBigInt(DoublyLinkedList <int> &dll1, DoublyLinkedList <int>
 		if (fark > 0){	dll2.addToDLLHead(0);	}	else {	dll1.addToDLLHead(0);	}
 	}
 	
-	   
-		DLLNode<int> *tmp_tail_1 = gettail(dll1);
-		DLLNode<int> *tmp_tail_2 = gettail(dll2);
-	
+   
+	DLLNode<int> *tmp_tail_1 = gettail(dll1);
+	DLLNode<int> *tmp_tail_2 = gettail(dll2);
+
 	for (int i=0 ; i < dll1.size() ; i++){				//SIZE FARKETMEZ ZATEN ESIT LOOP ICINDE TOPLA
 
 		
@@ -303,7 +313,23 @@ void ThinkBigger::update(DoublyLinkedList <int> &dll1, DoublyLinkedList <int> &d
 }
 
 
-void ThinkBigger::createBigInt(DoublyLinkedList <char> &tokens, DoublyLinkedList <int> *sayilarim[MAX_NUM]){
+void ThinkBigger::update(int sayino, string s){	// dll 1 = string s yapar ==OVERLOADED OLAN
+
+	
+	DoublyLinkedList<int> *sayimiz =  sayilarim[sayino];
+	
+	sayimiz->clear();
+	
+	unsigned int sizeim = s.size();	//Hata vermesin diye compiler once unsigned yap
+	
+	for (unsigned int i = sizeim-1 ; i < sizeim ; i--){
+		sayimiz->addToDLLHead(s[i] - 48);
+	}
+
+}
+
+
+void ThinkBigger::createBigInt(string s){
 		
 char temp_char;
 int sayi_index = 0;										//sayi indexlerini saydir
@@ -311,7 +337,10 @@ int sayi_index = 0;										//sayi indexlerini saydir
 sayilarim[sayi_index] = new DoublyLinkedList<int>();	//constructur i cagir donen mem adresini pointer array e kaydet ilk sayiyi dma ile olustur
 
 ifstream fin;
-fin.open("input.txt", ios::in);
+
+const char *cstr = s.c_str();	//ifstream fonksiyonu parametre olarak char istiyor
+
+fin.open(cstr, ios::in);
 
 	while (!fin.eof() ) {
 	
